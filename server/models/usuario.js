@@ -20,6 +20,7 @@ let usuarioSchema = new Schema({
         require: false
     },
     role: {
+        type: String,
         default: 'USER_ROLE'
     },
     estado: {
