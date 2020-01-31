@@ -7,7 +7,7 @@ const app = express();
 
 // Obtener lista de usuarios, o un usuario
 app.get('/usuario', function (req, res) {
-    res.json('get Usuario');
+    res.json('get Usuario LOCAL !!!');
 });
 
 // Crear registro
@@ -19,7 +19,7 @@ app.post('/usuario', function (req, res) {
         nombre: body.nombre,
         email: body.email,
         password: body.password,
-        role: body.rol
+        role: body.role
     });
 
     usuario.save( (err, usuarioDB) => {
