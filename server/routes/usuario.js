@@ -44,10 +44,25 @@ app.post('/usuario', function (req, res) {
 app.put('/usuario/:id', function (req, res) {
 
     let id = req.params.id;
+    let body = req.body;
 
-    res.json({
-        id
+    Usuario.findByIdAndUpdate( id, body, { new: true }, (err, usuarioDB) => {
+
+        if ( err ) {
+            return res.status(400).json({
+                ok: false,
+                err
+            });
+        }
+
+        res.json({
+            ok: true,
+            usuario: usuarioDB
+        });
+
     });
+
+
 });
 
 // Borrar, ya no se hace borrado real, sino borrado lógico cambiando estatus para dejarlo no disponible.
