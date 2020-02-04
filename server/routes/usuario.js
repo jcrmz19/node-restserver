@@ -11,13 +11,15 @@ const app = express();
 // Obtener lista de usuarios, o un usuario
 app.get('/usuario', function (req, res) {
 
+    let condicion = { estado: true };
+
     let desde = req.query.desde || 0;
     desde = Number(desde);
 
     let limite = req.query.limite || 5;
     limite = Number(limite);
 
-    Usuario.find({}, 'nombre email role estado google img')
+    Usuario.find(condicion, 'nombre email role estado google img')
         .skip(desde)
         .limit(limite)
         .exec( (err, usuarios) => {
@@ -29,7 +31,7 @@ app.get('/usuario', function (req, res) {
                 });
             }
 
-            Usuario.count({}, (err, conteo) => {
+            Usuario.count(condicion, (err, conteo) => {
                 res.json({
                     ok: true,
                     usuarios,
@@ -96,7 +98,11 @@ app.delete('/usuario/:id', function (req, res) {
 
     let id = req.params.id;
 
-    Usuario.findByIdAndRemove( id, (err, usuarioBorrado) => {
+    let cambiaEstado = {
+        estado: false
+    };
+
+    Usuario.findByIdAndUpdate( id, cambiaEstado, { new: true }, (err, usuarioDB) => {
 
         if ( err ) {
             return res.status(400).json({
@@ -105,18 +111,9 @@ app.delete('/usuario/:id', function (req, res) {
             });
         }
 
-        if ( !usuarioBorrado ) {
-            return res.status(400).json({
-                ok: false,
-                err: {
-                    message: 'Usuario no encontrado'
-                }
-            });
-        }
-
         res.json({
             ok: true,
-            usuario: usuarioBorrado
+            usuario: usuarioDB
         });
 
     });
