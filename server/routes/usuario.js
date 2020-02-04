@@ -38,7 +38,6 @@ app.get('/usuario', function (req, res) {
             });
 
         });
-
 });
 
 // Crear registro
@@ -90,13 +89,38 @@ app.put('/usuario/:id', function (req, res) {
         });
 
     });
-
-
 });
 
 // Borrar, ya no se hace borrado real, sino borrado lógico cambiando estatus para dejarlo no disponible.
-app.delete('/usuario', function (req, res) {
-    res.json('delete Usuario');
+app.delete('/usuario/:id', function (req, res) {
+
+    let id = req.params.id;
+
+    Usuario.findByIdAndRemove( id, (err, usuarioBorrado) => {
+
+        if ( err ) {
+            return res.status(400).json({
+                ok: false,
+                err
+            });
+        }
+
+        if ( !usuarioBorrado ) {
+            return res.status(400).json({
+                ok: false,
+                err: {
+                    message: 'Usuario no encontrado'
+                }
+            });
+        }
+
+        res.json({
+            ok: true,
+            usuario: usuarioBorrado
+        });
+
+    });
+
 });
 
 module.exports = app;
