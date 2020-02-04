@@ -10,7 +10,32 @@ const app = express();
 
 // Obtener lista de usuarios, o un usuario
 app.get('/usuario', function (req, res) {
-    res.json('get Usuario LOCAL !!!');
+
+    let desde = req.query.desde || 0;
+    desde = Number(desde);
+
+    let limite = req.query.limite || 5;
+    limite = Number(limite);
+
+    Usuario.find({})
+        .skip(desde)
+        .limit(limite)
+        .exec( (err, usuarios) => {
+
+            if ( err ) {
+                return res.status(400).json({
+                    ok: false,
+                    err
+                });
+            }
+
+            res.json({
+                ok: true,
+                usuarios
+            });
+
+        });
+
 });
 
 // Crear registro
