@@ -16,10 +16,14 @@ app.use(bodyParser.json());
 
 app.use( require('./routes/usuario') );
 
+const uri = "mongodb+srv://cafe:cafe@cluster0-csu9d.mongodb.net/cafe?retryWrites=true&w=majority";
+
 mongoose.connect(
-    'mongodb://localhost:27017/cafe', {
+    uri, {
         useNewUrlParser: true,
-        useUnifiedTopology: true
+        useUnifiedTopology: true,
+        useFindAndModify: false,
+        useCreateIndex: true
     },
     (err) => {
         if (err) { throw err; }
