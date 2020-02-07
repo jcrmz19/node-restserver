@@ -16,14 +16,13 @@ app.use(bodyParser.json());
 
 app.use( require('./routes/usuario') );
 
-const uri = "mongodb+srv://cafe:cafe@cluster0-csu9d.mongodb.net/cafe?retryWrites=true&w=majority";
+const uri = "mongodb+srv://cor:xbUtPpuPmIseVUGT@cluster0-jols1.mongodb.net/cafe?retryWrites=true&w=majority";
 
 mongoose.connect(
     uri, {
         useNewUrlParser: true,
-        useUnifiedTopology: true,
-        useFindAndModify: false,
-        useCreateIndex: true
+        useCreateIndex: true,
+        useUnifiedTopology: true
     },
     (err) => {
         if (err) { throw err; }
