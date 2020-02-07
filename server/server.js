@@ -16,10 +16,8 @@ app.use(bodyParser.json());
 
 app.use( require('./routes/usuario') );
 
-const uri = "mongodb+srv://cor:xbUtPpuPmIseVUGT@cluster0-jols1.mongodb.net/cafe?retryWrites=true&w=majority";
-
 mongoose.connect(
-    uri, {
+    process.env.URLDB, {
         useNewUrlParser: true,
         useCreateIndex: true,
         useUnifiedTopology: true
