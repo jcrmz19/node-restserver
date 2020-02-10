@@ -3,13 +3,14 @@ const bcrypt = require('bcrypt');
 const _ = require('underscore');
 
 const Usuario = require('../models/usuario');
+const { verificaToken } = require('../middlewares/autenticacion');
 
 const app = express();
 
 // Por convención se usa de la siguiente manera. Aunque se pueden guardar o modificar con get o la petición que sea.
 
 // Obtener lista de usuarios, o un usuario
-app.get('/usuario', function (req, res) {
+app.get('/usuario', verificaToken, (req, res) => {
 
     let condicion = { estado: true };
 
