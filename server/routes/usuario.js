@@ -44,7 +44,7 @@ app.get('/usuario', verificaToken, (req, res) => {
 });
 
 // Crear registro
-app.post('/usuario', function (req, res) {
+app.post('/usuario', verificaToken, function (req, res) {
 
     let body = req.body;
 
@@ -72,7 +72,7 @@ app.post('/usuario', function (req, res) {
 });
 
 // Actualizar, igualmente usado el patch
-app.put('/usuario/:id', function (req, res) {
+app.put('/usuario/:id', verificaToken, function (req, res) {
 
     let id = req.params.id;
     let body = _.pick(req.body, ['nombre','email','img','role','estado'] );
@@ -95,7 +95,7 @@ app.put('/usuario/:id', function (req, res) {
 });
 
 // Borrar, ya no se hace borrado real, sino borrado lógico cambiando estatus para dejarlo no disponible.
-app.delete('/usuario/:id', function (req, res) {
+app.delete('/usuario/:id', verificaToken, function (req, res) {
 
     let id = req.params.id;
 
