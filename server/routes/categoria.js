@@ -4,7 +4,6 @@ const _ = require('underscore');
 const Categoria = require('../models/categoria');
 const { verificaToken, verificaAdminRole } = require('../middlewares/autenticacion');
 
-
 const app = express();
 
 // ==============================================================================
@@ -73,11 +72,20 @@ app.post('/categoria', verificaToken, (req, res) => {
     let body = req.body;
 
     let categoria = new Categoria({
-        nombre: body.nombre
+        descripcion: body.descripcion,
+        usuario: req.usuario._id
     });
 
     categoria.save( (err, categoriaDB) => {
+
         if ( err ) {
+            return res.status(500).json({
+                ok: false,
+                err
+            });
+        }
+
+        if (!categoriaDB) {
             return res.status(400).json({
                 ok: false,
                 err
@@ -88,6 +96,7 @@ app.post('/categoria', verificaToken, (req, res) => {
             ok: true,
             categoria: categoriaDB
         });
+
     });
 });
 
@@ -96,13 +105,23 @@ app.post('/categoria', verificaToken, (req, res) => {
 // ==============================================================================
 app.put('/categoria/:id', verificaToken, (req, res) => {
 
-    const id = req.params.id;
+    let id = req.params.id;
+    let body = req.body;
 
-    let body = _.pick(req.body, ['nombre'] );
+    let descCategoria = {
+        descripcion: body.descripcion
+    }
 
-    Categoria.findByIdAndUpdate( id, body, { new: true, runValitators: true }, (err, categoriaDB) => {
+    Categoria.findByIdAndUpdate( id, descCategoria, { new: true, runValitators: true }, (err, categoriaDB) => {
 
         if ( err ) {
+            return res.status(500).json({
+                ok: false,
+                err
+            });
+        }
+
+        if (!categoriaDB) {
             return res.status(400).json({
                 ok: false,
                 err
