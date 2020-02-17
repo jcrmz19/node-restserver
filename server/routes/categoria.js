@@ -9,13 +9,13 @@ const app = express();
 // ==============================================================================
 // Mostrar todas las categorias
 // ==============================================================================
-app.get('/categoria', (req, res) => {
+app.get('/categoria', verificaToken, (req, res) => {
 
-    Categoria.find({}, 'nombre')
+    Categoria.find({})
         .exec( (err, categorias) => {
 
             if ( err ) {
-                return res.status(400).json({
+                return res.status(500).json({
                     ok: false,
                     err
                 });
@@ -42,26 +42,34 @@ app.get('/categoria', (req, res) => {
 // ==============================================================================
 // Mostrar una categoría por ID
 // ==============================================================================
-app.get('/categoria/:id', (req, res) => {
+app.get('/categoria/:id', verificaToken, (req, res) => {
 
-    const id = req.params.id;
+    let id = req.params.id;
 
-    Categoria.find({_id: id}, 'nombre')
-        .exec( (err, categoria) => {
+    Categoria.findById(id, (err, categoriaDB) => {
 
-            if ( err ) {
-                return res.status(400).json({
-                    ok: false,
-                    err
-                });
-            }
-
-            res.json({
-                ok: true,
-                categoria
+        if ( err ) {
+            return res.status(400).json({
+                ok: false,
+                err
             });
+        }
 
+        if ( !categoriaDB ) {
+            return res.status(400).json({
+                ok: false,
+                err: {
+                    message: 'El ID no es correcto'
+                }
+            });
+        }
+
+        res.json({
+            ok: true,
+            categoria: categoriaDB
         });
+
+    });
 });
 
 // ==============================================================================
@@ -143,27 +151,27 @@ app.delete('/categoria/:id', [verificaToken, verificaAdminRole], (req, res) => {
 
     const id = req.params.id;
 
-    Categoria.findByIdAndRemove( id, (err, categoriaBorrada) => {
+    Categoria.findByIdAndRemove( id, (err, categoriaDB) => {
 
         if ( err ) {
-            return res.status(400).json({
+            return res.status(500).json({
                 ok: false,
                 err
             });
         }
 
-        if ( !categoriaBorrada ) {
+        if (!categoriaDB) {
             return res.status(400).json({
                 ok: false,
                 err: {
-                    message: 'Categoria no encontrada'
+                    message: 'El id no existe'
                 }
             });
         }
 
         res.json({
             ok: true,
-            categoria: categoriaBorrada
+            message: 'Categoría borrada'
         });
 
     });
