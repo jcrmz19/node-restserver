@@ -29,8 +29,38 @@ app.get('/productos/:id', (req, res) => {
 // ==============================================================================
 app.post('/productos', (req, res) => {
 
-    // grabar el usuario
-    // grabar una categoria del listado
+    let body = req.body;
+
+    let producto = new Producto({
+        nombre: body.nombre,
+        precioUni: body.precioUni,
+        descripcion: body.descripcion,
+        disponible: body.disponible,
+        categoria: body.categoria,
+        usuario: body.usuario,
+    });
+
+    producto.save( (err, productoDB) => {
+
+        if ( err ) {
+            return res.status(500).json({
+                ok: false,
+                err
+            });
+        }
+
+        if (!productoDB) {
+            return res.status(400).json({
+                ok: false,
+                err
+            });
+        }
+
+        res.json({
+            ok: true,
+            producto: productoDB
+        });
+    });
 
 });
 
@@ -39,9 +69,37 @@ app.post('/productos', (req, res) => {
 // ==============================================================================
 app.put('/productos/:id', (req, res) => {
 
-    // grabar el usuario
-    // grabar una categoria del listado
+    let id = req.params.id;
+    let body = req.body;
 
+    let producto = new Producto({
+        nombre: body.nombre,
+        precioUni: body.precioUni,
+        descripcion: body.descripcion,
+        disponible: body.disponible
+    });
+
+    Producto.findByIdAndUpdate( id, producto, { new: true, runValitators: true }, (err, productoDB) => {
+
+        if ( err ) {
+            return res.status(500).json({
+                ok: false,
+                err
+            });
+        }
+
+        if (!productoDB) {
+            return res.status(400).json({
+                ok: false,
+                err
+            });
+        }
+
+        res.json({
+            ok: true,
+            producto: productoDB
+        });
+    });
 });
 
 // ==============================================================================
@@ -49,9 +107,33 @@ app.put('/productos/:id', (req, res) => {
 // ==============================================================================
 app.delete('/productos/:id', (req, res) => {
 
-    // fisicamente si exite
-    // disponible pasa a falso
+    let id = req.params.id;
 
+    let producto = new Producto({
+        disponible: false
+    });
+
+    Producto.findByIdAndUpdate( id, producto, { new: true, runValitators: true }, (err, productoDB) => {
+
+        if ( err ) {
+            return res.status(500).json({
+                ok: false,
+                err
+            });
+        }
+
+        if (!productoDB) {
+            return res.status(400).json({
+                ok: false,
+                err
+            });
+        }
+
+        res.json({
+            ok: true,
+            producto: productoDB
+        });
+    });
 });
 
 module.exports = app;
