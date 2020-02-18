@@ -9,9 +9,25 @@ let Producto = require('../models/producto');
 // ==============================================================================
 app.get('/productos', (req, res) => {
 
-    // trae todos los productos
-    // pupulate: usuario categoria
-    // paginado
+    Producto.find({})
+        .sort('nombre')
+        .populate('usuario', 'nombre email')
+        .populate('categoria', 'descripcion')
+        .exec( (err, categorias) => {
+
+            if ( err ) {
+                return res.status(500).json({
+                    ok: false,
+                    err
+                });
+            }
+
+            res.json({
+                ok: true,
+                categorias
+             });
+
+        })
 
 });
 
@@ -20,24 +36,48 @@ app.get('/productos', (req, res) => {
 // ==============================================================================
 app.get('/productos/:id', (req, res) => {
 
-    // pupulate: usuario categoria
+    let id = req.params.id;
+
+    Producto.findById( id, (err, productoDB) => {
+
+        if ( err ) {
+            return res.status(400).json({
+                ok: false,
+                err
+            });
+        }
+
+        if ( !productoDB ) {
+            return res.status(400).json({
+                ok: false,
+                err: {
+                    message: 'El ID no es correcto'
+                }
+            });
+        }
+
+        res.json({
+            ok: true,
+            producto: productoDB
+        });
+    });
 
 });
 
 // ==============================================================================
 // Crear un nuevo producto
 // ==============================================================================
-app.post('/productos', (req, res) => {
+app.post('/productos', verificaToken, (req, res) => {
 
     let body = req.body;
 
     let producto = new Producto({
+        usuario: req.usuario._id,
         nombre: body.nombre,
         precioUni: body.precioUni,
         descripcion: body.descripcion,
         disponible: body.disponible,
-        categoria: body.categoria,
-        usuario: body.usuario,
+        categoria: body.categoria
     });
 
     producto.save( (err, productoDB) => {
@@ -56,7 +96,7 @@ app.post('/productos', (req, res) => {
             });
         }
 
-        res.json({
+        res.status(201).json({
             ok: true,
             producto: productoDB
         });
@@ -72,14 +112,7 @@ app.put('/productos/:id', (req, res) => {
     let id = req.params.id;
     let body = req.body;
 
-    let producto = new Producto({
-        nombre: body.nombre,
-        precioUni: body.precioUni,
-        descripcion: body.descripcion,
-        disponible: body.disponible
-    });
-
-    Producto.findByIdAndUpdate( id, producto, { new: true, runValitators: true }, (err, productoDB) => {
+    Producto.findById(id, (err, productoDB) => {
 
         if ( err ) {
             return res.status(500).json({
@@ -91,14 +124,34 @@ app.put('/productos/:id', (req, res) => {
         if (!productoDB) {
             return res.status(400).json({
                 ok: false,
-                err
+                err: {
+                    message: 'El ID no existe'
+                }
             });
         }
 
-        res.json({
-            ok: true,
-            producto: productoDB
+        productoDB.nombre = body.nombre;
+        productoDB.precioUni = body.precioUni;
+        productoDB.categoria = body.categoria;
+        productoDB.disponible = body.disponible;
+        productoDB.descripcion = body.descripcion;
+
+        productoDB.save( (err, productoGuardado) => {
+
+            if ( err ) {
+                return res.status(500).json({
+                    ok: false,
+                    err
+                });
+            }
+
+            res.json({
+                ok: true,
+                producto: productoGuardado
+            });
+
         });
+
     });
 });
 
