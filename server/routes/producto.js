@@ -70,6 +70,34 @@ app.get('/productos/:id', verificaToken, (req, res) => {
 });
 
 // ==============================================================================
+// Buscar Productos
+// ==============================================================================
+app.get('/productos/buscar/:termino', verificaToken, (req, res) => {
+
+    let termino = req.params.termino;
+
+    let regex = new RegExp(termino, 'i');
+
+    Producto.find({ nombre: regex })
+        .populate('usuario', 'nombre email')
+        .populate('categoria', 'descripcion')
+        .exec( (err, productos) => {
+
+            if ( err ) {
+                return res.status(500).json({
+                    ok: false,
+                    err
+                });
+            }
+
+            res.json({
+                ok: true,
+                productos
+            });
+        });
+});
+
+// ==============================================================================
 // Crear un nuevo producto
 // ==============================================================================
 app.post('/productos', verificaToken, (req, res) => {
