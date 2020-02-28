@@ -2,12 +2,15 @@ const express = require('express');
 const fileUpload = require('express-fileupload');
 const app = express();
 
+const Usuario = require('../models/usuario');
+
 // default options
 app.use(fileUpload());
 
-app.put('/upload', function(req, res) {
+app.put('/upload/:tipo/:id', function(req, res) {
 
-    console.log(req.files);
+    let tipo = req.params.tipo;
+    let id = req.params.id;
 
     if (!req.files) {
         return res.status(400)
@@ -19,6 +22,19 @@ app.put('/upload', function(req, res) {
             });
     }
 
+    // Validar tipo
+    let tiposValidos = ['productos', 'usuarios'];
+    if ( tiposValidos.indexOf( tipo ) < 0 ) {
+        return res.status(400)
+            .json({
+                ok: false,
+                err: {
+                    message: 'Los tipos permitidos son ' + tiposValidos.join(', ')
+                }
+            });
+    }
+
+
     let archivo = req.files.archivo;
 
     // Extensiones permitidas
@@ -26,7 +42,7 @@ app.put('/upload', function(req, res) {
     let nombreCortado = archivo.name.split('.');
     let extension = nombreCortado[nombreCortado.length -1];
 
-    if ( extensionesValidas.indexOf( extension ) < 0) {
+    if ( extensionesValidas.indexOf( extension ) < 0 ) {
         return res.status(400)
             .json({
                 ok: false,
@@ -37,9 +53,10 @@ app.put('/upload', function(req, res) {
             });
     }
 
-    console.log(extension);
+    // Cambiar nombre al archivo
+    let nombreArchivo = `${ id }-${ Date.now() }.${ extension }`;
 
-    archivo.mv(`uploads/${archivo.name}`, (err) => {
+    archivo.mv(`uploads/${ tipo }/${ nombreArchivo }`, (err) => {
 
         if (err) {
             return res.status(500)
